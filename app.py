@@ -1,19 +1,23 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, request, url_for
 
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 
 @app.route('/')
 def index():
-    title = 'Pinterest Clone'
-    message = 'Hello, world!'
-    return render_template('index.html', title=title, message=message)
+    user = None
+    return render_template('home.html',
+                           app_name='Pinterest Clone',
+                           title='All images',
+                           user=user
+                           )
+
 
 
 if __name__ == '__main__':
