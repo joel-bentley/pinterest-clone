@@ -5,10 +5,15 @@
   <div class="grid">
     {% for image in images %}
       <div class="grid-item">
-        <img src={{ image['image'] }} />
-        <p>{{ image['title'] }}</p>
+        <div class="image">
+          <img src={{ image['image'] }} />
+          <p>{{ image['text'] }}</p>
+        </div>
+        <div class="info">
+          <img src={{ url_for('static', filename='img/twitter-egg-icon.png') }} />
+        </div>
       </div>
     {% endfor %}
   </div>
-
+  
 {% endblock %}

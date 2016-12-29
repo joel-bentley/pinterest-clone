@@ -1,1 +1,52 @@
 /* main.css */
+
+body {
+  background-color: #fff;
+  font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
+}
+
+.container {
+  margin-top: 50px;
+}
+
+.grid {
+  margin: 0 auto;
+  width: auto;
+}
+
+.grid-item {
+  padding: 5px;
+  width: 200px;
+  text-align: center;
+  margin-bottom: 15px;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+}
+
+.grid-item:hover {
+  background-color:  #e8e8e8;
+}
+
+.image img {
+  width: 190px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.image p {
+  margin-top: 7px;
+  margin-bottom: 0px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #333;
+}
+
+.info {
+  margin-top: 5px;
+  padding: 5px;
+  text-align: left;
+}
+
+.info img {
+  width: 35px;
+}

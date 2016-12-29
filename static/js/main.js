@@ -1,6 +1,14 @@
 // main.js
 
-$('.grid').masonry({
+// init Masonry
+var $grid = $('.grid').masonry({
   itemSelector: '.grid-item',
-  columnWidth: 180
+  columnWidth: 200,
+  gutter: 15,
+  isFitWidth: true
+});
+
+// layout Masonry after each image loads
+$grid.imagesLoaded().progress( function() {
+  $grid.masonry('layout');
 });

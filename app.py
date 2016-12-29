@@ -9,10 +9,8 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 # toolbar = DebugToolbarExtension(app)
 
 images = [
-    {"title": "Here's a cat", "image": "https://placekitten.com/g/160/120"},
-    {"title": "Here's a cat", "image": "https://placekitten.com/g/160/120"},
-    {"title": "Here's a cat", "image": "https://placekitten.com/g/160/120"},
-    {"title": "Here's a cat", "image": "https://placekitten.com/g/160/120"},
+    {'text': 'Here is a cat', 'image': 'https://placekitten.com/g/160/120' }
+    for __ in range(10)
 ]
 
 @app.route('/')
