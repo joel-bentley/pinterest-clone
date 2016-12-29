@@ -2,6 +2,13 @@
 
 {% block content %}
 
-  <h1>Hello, world!</h1>
+  <div class="grid">
+    {% for image in images %}
+      <div class="grid-item">
+        <img src={{ image['image'] }} />
+        <p>{{ image['title'] }}</p>
+      </div>
+    {% endfor %}
+  </div>
 
 {% endblock %}
