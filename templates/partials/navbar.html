@@ -7,7 +7,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="/">
         <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
         Pinterest Clone
       </a>
@@ -22,24 +22,24 @@
       </form>
       <ul class="nav navbar-nav navbar-right">
         <li {% if title=='All images' %} class="active"{% endif %}>
-          <a href="#">
+          <a href="/">
             All images
             {% if title=='All images' %}<span class="sr-only">(current)</span>{% endif %}
           </a>
         </li>
         {% if user %}
           <li {% if title=='My images' %} class="active"{% endif %}>
-            <a href="#">
+            <a href="/myimages">
               My images
               {% if title=='My images' %}<span class="sr-only">(current)</span>{% endif %}
             </a>
           </li>
           <li>
-            <a href="#">Logout</a>
+            <a href="/logout">Logout</a>
           </li>
         {% else %}
           <li {% if title=='Login' %} class="active"{% endif %}>
-            <a href="#">
+            <a href="/login">
               Login
               {% if title=='Login' %}<span class="sr-only">(current)</span>{% endif %}
             </a>
