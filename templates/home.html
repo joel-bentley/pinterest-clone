@@ -6,7 +6,7 @@
     {% for image in images %}
       <div class="grid-item">
         <div class="image">
-          <img src={{ image['image'] }} />
+          <img src={{ image['image'] }} onerror="this.src='/static/img/placeholder.png'" />
           <p>{{ image['text'] }}</p>
         </div>
         <div class="info">
@@ -15,5 +15,5 @@
       </div>
     {% endfor %}
   </div>
-  
+
 {% endblock %}
