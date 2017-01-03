@@ -6,11 +6,11 @@
     {% for image in images %}
       <div class="grid-item">
         <div class="image">
-          <img src={{ image['image'] }} onerror="this.src='/static/img/placeholder.png'" />
+          <img src={{ image['image'] }} onerror="this.src='{{ url_for('static', filename='img/placeholder.png') }}'" />
           <p>{{ image['text'] }}</p>
         </div>
         <div class="info">
-          <img src={{ url_for('static', filename='img/twitter-egg-icon.png') }} />
+          <img src="{{ url_for('static', filename='img/twitter-egg-icon.png') }}" />
         </div>
       </div>
     {% endfor %}

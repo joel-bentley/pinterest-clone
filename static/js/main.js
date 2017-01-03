@@ -1,6 +1,6 @@
 // main.js
 
-// init Masonry
+// Masonry js
 var $grid = $('.grid').masonry({
   itemSelector: '.grid-item',
   columnWidth: 200,
