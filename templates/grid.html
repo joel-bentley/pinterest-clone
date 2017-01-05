@@ -10,7 +10,7 @@
           <p>{{ image['text'] }}</p>
         </div>
         <div class="info">
-          <img src="{{ url_for('static', filename='img/twitter-egg-icon.png') }}" />
+          <img src="https://twitter.com/{{ user }}/profile_image?size=normal" onerror="this.src='{{ url_for('static', filename='img/twitter-egg-icon.png') }}'" />
         </div>
       </div>
     {% endfor %}

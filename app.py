@@ -20,6 +20,10 @@ class User(db.Model):
     twitter_id = db.Column(db.String(80), unique=True)
     twitter_name = db.Column(db.String(80), unique=True)
 
+    def __init__(self, twitter_id, twitter_name):
+        self.twitter_id = twitter_id
+        self.twitter_name = twitter_name
+
     def __repr__(self):
         return '<User(id={}, twitter_id={}, twitter_name={})>'.format(self.id, self.twitter_id, self.twitter_name)
 
@@ -28,14 +32,20 @@ class Pin(db.Model):
     __tablename__ = 'pins'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    twitter_name = db.Column(db.String(80))
     text = db.Column(db.String(140))
     image = db.Column(db.String(140))
 
+    def __init__(self, twitter_name, text, image):
+        self.twitter_name = twitter_name
+        self.text = text
+        self.image = image
+
     def __repr__(self):
-        return '<Pin(id={}, user_id={})>'.format(self.id, self.user_id)
+        return '<Pin(id={}, twitter_name={})>'.format(self.id, self.twitter_name)
 
 # toolbar = DebugToolbarExtension(app)
+
 
 @app.before_first_request
 def create_tables():
@@ -52,30 +62,42 @@ twitter = oauth.remote_app(name='twitter',
                            consumer_secret=os.environ['TWITTER_SECRET']
                            )
 
+
 @twitter.tokengetter
 def get_twitter_token(token=None):
     return session.get('twitter_token')
 
 
-images = [
-    {'text': 'Here is a cat', 'image': 'https://placekitten.com/g/180/150'}
-    for __ in range(10)
-]
-
 app_name = 'Pinterest Clone'
 
 @app.route('/')
 def home():
-    user = session.get('twitter_name')
+    twitter_name = session.get('twitter_name')
+    images = Pin.query.all()
     return render_template('grid.html',
-            title='All images', app_name=app_name, images=images, user=user)
+            title='All images', app_name=app_name, images=images, user=twitter_name)
 
 
 @app.route('/myimages')
 def my_images():
-    user = session.get('twitter_name')
+    twitter_name = session.get('twitter_name')
+    images = Pin.query.filter_by(twitter_name=twitter_name).all()
     return render_template('grid.html',
-            title='My images', app_name=app_name, images=images[0:2], user=user)
+            title='My images', app_name=app_name, images=images, user=twitter_name)
+
+
+@app.route('/newimage', methods=['POST'])
+def post_image():
+    twitter_name = session['twitter_name']
+    image_url = request.form.get('image_url')
+    image_text = request.form.get('image_text')
+
+    if twitter_name and image_url and image_text:
+        new_pin = Pin(twitter_name, image_text, image_url)
+        db.session.add(new_pin)
+        db.session.commit()
+
+    return redirect(request.referrer or url_for('home'))
 
 
 @app.route('/login')
@@ -100,13 +122,22 @@ def twitter_auth_callback():
         ))
         return redirect(next_url)
 
-
     session['twitter_token'] = (
         resp['oauth_token'],
         resp['oauth_token_secret']
     )
-    session['twitter_name'] = resp['screen_name']
-    session['twitter_id'] = resp['user_id']
+    twitter_name = resp['screen_name']
+    twitter_id = resp['user_id']
+
+    session['twitter_name'] = twitter_name
+    session['twitter_id'] = twitter_id
+
+    user = User.query.filter_by(twitter_name=twitter_name).first()
+
+    if not user:
+        new_user = User(twitter_id, twitter_name)
+        db.session.add(new_user)
+        db.session.commit()
 
     return redirect(next_url)
 
