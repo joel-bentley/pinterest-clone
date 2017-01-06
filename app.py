@@ -99,6 +99,17 @@ def post_image():
 
     return redirect(request.referrer or url_for('home'))
 
+@app.route('/deleteimage/<pin_id>')
+def delete_image(pin_id):
+    twitter_name = session['twitter_name']
+    pin = Pin.query.get(pin_id)
+
+    if pin.twitter_name == twitter_name:
+        db.session.delete(pin)
+        db.session.commit()
+
+    return redirect(request.referrer or url_for('home'))
+
 
 @app.route('/login')
 def login():

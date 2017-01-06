@@ -10,7 +10,14 @@
           <p>{{ image['text'] }}</p>
         </div>
         <div class="info">
-          <img src="https://twitter.com/{{ user }}/profile_image?size=normal" onerror="this.src='{{ url_for('static', filename='img/twitter-egg-icon.png') }}'" />
+          <img src="https://twitter.com/{{ image['twitter_name'] }}/profile_image?size=normal" onerror="this.src='{{ url_for('static', filename='img/twitter-egg-icon.png') }}'" />
+          {% if user == image['twitter_name'] %}
+            <a href="/deleteimage/{{ image['id'] }}">
+              <span class="glyphicon glyphicon-remove remove-icon" aria-hidden="true">
+                <dir class="sr-only">Click to remove image.</dir>
+              </span>
+            </a>
+          {% endif %}
         </div>
       </div>
     {% endfor %}

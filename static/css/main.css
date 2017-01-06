@@ -59,3 +59,13 @@ body {
   margin-top: 5px;
   border: 1px solid #ccd6dd;
 }
+
+.remove-icon {
+  float: right;
+  color: #aaa;
+  margin: 22px 0 0 0;
+}
+
+.remove-icon:hover {
+  color: red;
+}
