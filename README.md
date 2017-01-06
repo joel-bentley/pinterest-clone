@@ -1,7 +1,7 @@
 #pinterest-clone
 Built for Pinterest Clone challenge on Free Code Camp.
 
-**Live Demo:** ~~https://joel-bentley-pinterest-clone.herokuapp.com/~~ (in progress)
+**Live Demo:** https://joel-bentley-pinterest-clone.herokuapp.com/
 
 ---
 
@@ -21,6 +21,14 @@ User story requirements for this project: (<https://www.freecodecamp.com/challen
 
 ---
 
-To use, first run script in .env and then create virtual environment in project folder.
+To use, first check variables in and run script in .env file. Then create virtual environment in project folder.
 
-Then...
+Create PostgreSQL database with name and location you provided in .env file.
+
+Create Twitter app and set TWITTER_KEY and TWITTER_SECRET environmental variables.
+
+You should also set SECRET_KEY environmental variable to random string.
+
+To install dependencies type:  pip install -r requirements.txt
+
+Then, to start Flask server type:  python app.py
