@@ -14,7 +14,6 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     __tablename__ = 'users'
-
     id = db.Column(db.Integer, primary_key=True)
     twitter_id = db.Column(db.String(80), unique=True)
     twitter_name = db.Column(db.String(80), unique=True)
@@ -23,7 +22,6 @@ class User(db.Model):
 
 class Pin(db.Model):
     __tablename__ = 'pins'
-
     id = db.Column(db.Integer, primary_key=True)
     twitter_name = db.Column(db.String(80))
     text = db.Column(db.String(140))
