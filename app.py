@@ -4,8 +4,6 @@ from flask import redirect, render_template, request, session, url_for
 from flask_oauthlib.client import OAuth
 from flask_sqlalchemy import SQLAlchemy
 
-# from flask_debugtoolbar import DebugToolbarExtension
-
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 
@@ -19,13 +17,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     twitter_id = db.Column(db.String(80), unique=True)
     twitter_name = db.Column(db.String(80), unique=True)
-
-    def __init__(self, twitter_id, twitter_name):
-        self.twitter_id = twitter_id
-        self.twitter_name = twitter_name
-
-    def __repr__(self):
-        return '<User(id={}, twitter_id={}, twitter_name={})>'.format(self.id, self.twitter_id, self.twitter_name)
+    tokens = db.relationship('Token', backref='user', lazy='dynamic')
 
 
 class Pin(db.Model):
@@ -36,15 +28,14 @@ class Pin(db.Model):
     text = db.Column(db.String(140))
     image = db.Column(db.String(140))
 
-    def __init__(self, twitter_name, text, image):
-        self.twitter_name = twitter_name
-        self.text = text
-        self.image = image
 
-    def __repr__(self):
-        return '<Pin(id={}, twitter_name={})>'.format(self.id, self.twitter_name)
-
-# toolbar = DebugToolbarExtension(app)
+class Token(db.Model):
+    __tablename__ = 'tokens'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    name = db.Column(db.String(40))
+    oauth_token = db.Column(db.String(120))
+    oauth_token_secret = db.Column(db.String(120))
 
 
 @app.before_first_request
@@ -65,7 +56,10 @@ twitter = oauth.remote_app(name='twitter',
 
 @twitter.tokengetter
 def get_twitter_token(token=None):
-    return session.get('twitter_token')
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    twitter_token = Token.query.filter_by(user=user, name='Twitter').first()
+    return (twitter_token.oauth_token, twitter_token.oauth_token_secret)
 
 
 app_name = 'Pinterest Clone'
@@ -93,7 +87,7 @@ def post_image():
     image_text = request.form.get('image_text')
 
     if twitter_name and image_url and image_text:
-        new_pin = Pin(twitter_name, image_text, image_url)
+        new_pin = Pin(twitter_name=twitter_name, text=image_text, image=image_url)
         db.session.add(new_pin)
         db.session.commit()
 
@@ -133,31 +127,57 @@ def twitter_auth_callback():
         ))
         return redirect(next_url)
 
-    session['twitter_token'] = (
-        resp['oauth_token'],
-        resp['oauth_token_secret']
-    )
     twitter_name = resp['screen_name']
     twitter_id = resp['user_id']
+    oauth_token = resp['oauth_token']
+    oauth_token_secret = resp['oauth_token_secret']
 
-    session['twitter_name'] = twitter_name
-    session['twitter_id'] = twitter_id
+    user = User.query.filter_by(twitter_id=twitter_id).first()
 
-    user = User.query.filter_by(twitter_name=twitter_name).first()
+    # Twitter Name associated with Twitter Id can be changed
+    if user:
+        if user.twitter_name != twitter_name:
+            user.twitter_name = twitter_name
+            db.session.commit()
+        twitter_token = Token.query.filter_by(
+            user=user, name='Twitter').first()
 
-    if not user:
-        new_user = User(twitter_id, twitter_name)
+    else:
+        new_user = User(twitter_id=twitter_id, twitter_name=twitter_name)
         db.session.add(new_user)
         db.session.commit()
+
+    user = User.query.filter_by(twitter_id=twitter_id).first()
+    twitter_token = Token.query.filter_by(user=user, name='Twitter').first()
+    if twitter_token:
+        twitter_token.oauth_token = oauth_token
+        twitter_token.oauth_token_secret = oauth_token_secret
+        db.session.commit()
+    else:
+        twitter_token = Token(name='Twitter', oauth_token=oauth_token,
+                              oauth_token_secret=oauth_token_secret, user=user)
+        db.session.add(twitter_token)
+        db.session.commit()
+
+    session['user_id'] = user.id
+    session['twitter_id'] = twitter_id
+    session['twitter_name'] = twitter_name
 
     return redirect(next_url)
 
 
 @app.route('/logout')
 def logout():
-    session.pop('twitter_name', None)
+    """Logout by removing session keys and all tokens from database"""
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    tokens = Token.query.filter_by(user=user).all()
+    for token in tokens:
+        db.session.delete(token)
+    db.session.commit()
+    session.pop('user_id', None)
     session.pop('twitter_id', None)
-    session.pop('twitter_token', None)
+    session.pop('twitter_name', None)
     return redirect(url_for('home'))
 
 
