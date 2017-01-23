@@ -3,6 +3,7 @@ from flask import Flask
 from flask import redirect, render_template, request, session, url_for
 from flask_oauthlib.client import OAuth
 from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -62,6 +63,16 @@ def get_twitter_token(token=None):
     return (twitter_token.oauth_token, twitter_token.oauth_token_secret)
 
 
+# Login Decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' in session:
+            return f(*args, **kwargs)
+        return redirect(url_for('login'))
+    return decorated_function
+
+
 app_name = 'Pinterest Clone'
 
 @app.route('/')
@@ -73,6 +84,7 @@ def home():
 
 
 @app.route('/myimages')
+@login_required
 def my_images():
     twitter_name = session.get('twitter_name')
     images = Pin.query.filter_by(twitter_name=twitter_name).all()
@@ -81,6 +93,7 @@ def my_images():
 
 
 @app.route('/newimage', methods=['POST'])
+@login_required
 def post_image():
     twitter_name = session['twitter_name']
     image_url = request.form.get('image_url')
@@ -94,6 +107,7 @@ def post_image():
     return redirect(request.referrer or url_for('home'))
 
 @app.route('/deleteimage/<pin_id>')
+@login_required
 def delete_image(pin_id):
     twitter_name = session['twitter_name']
     pin = Pin.query.get(pin_id)
