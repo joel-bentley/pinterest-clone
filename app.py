@@ -76,7 +76,7 @@ app_name = 'Pinterest Clone'
 @app.route('/')
 def home():
     twitter_name = session.get('twitter_name')
-    images = Pin.query.all()
+    images = Pin.query.all().reverse()
     return render_template('grid.html',
             title='All images', app_name=app_name, images=images, user=twitter_name)
 
@@ -85,7 +85,7 @@ def home():
 @login_required
 def my_images():
     twitter_name = session.get('twitter_name')
-    images = Pin.query.filter_by(twitter_name=twitter_name).all()
+    images = Pin.query.filter_by(twitter_name=twitter_name).all().reverse()
     return render_template('grid.html',
             title='My images', app_name=app_name, images=images, user=twitter_name)
 
